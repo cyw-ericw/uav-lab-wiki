@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="給實驗室新進成員的無人機技術入門筆記。從 Pixhawk、ArduPilot 到飛行模式，先把最常遇到的問題弄懂。">
+  <meta name="theme-color" content="#0c2b3b">
+  <title>UAV Lab Wiki｜實驗室新生無人機入門筆記</title>
+  <link rel="icon" type="image/svg+xml" href="assets/img/uav-mark.svg">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="UAV Lab Wiki 首頁">
+        <img class="brand-mark" src="assets/img/uav-mark.svg" alt="">
+        <span>UAV Lab Wiki <small>Newcomer's field notes</small></span>
+      </a>
+      <nav class="main-nav" aria-label="主要導覽">
+        <a aria-current="page" href="index.html">首頁</a>
+        <a href="#articles">學習筆記</a>
+        <a class="nav-pill" href="#start">從這裡開始 ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div>
+          <span class="eyebrow">A FIELD GUIDE FOR NEW LAB MEMBERS</span>
+          <h1 id="hero-title">剛碰 UAV，<br>先從<em>這裡</em>開始。</h1>
+          <p class="hero-copy">Pixhawk、ArduPilot、EKF、飛行模式……剛進實驗室時，每個名詞都不太熟。這裡把最常查的基礎知識整理成短短的入門筆記，先搞懂概念，再回頭看官方文件。</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#articles">閱讀入門文章 <span aria-hidden="true">↗</span></a>
+            <a class="btn btn-secondary" href="#start">看看建議順序 <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+        <div class="hero-panel" aria-hidden="true">
+          <span class="panel-tag">學弟妹的第一份筆記</span>
+          <div class="orbit-card">
+            <div class="orbit-top"><span>UAV / 001</span><span>FIELD NOTES</span></div>
+            <div class="drone-graphic">
+              <svg viewBox="0 0 360 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="180" cy="110" rx="138" ry="77" stroke="#b9d9ce" opacity=".27" stroke-dasharray="4 8"/>
+                <path d="M122 61 238 159M238 61 122 159" stroke="#c7f58c" stroke-width="14" stroke-linecap="round"/>
+                <path d="M124 65 236 155M236 65 124 155" stroke="#175462" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="180" cy="110" r="28" fill="#c7f58c" stroke="#f2ffe4" stroke-width="6"/>
+                <path d="M165 106h30M180 96v27" stroke="#103d45" stroke-width="4" stroke-linecap="round"/>
+                <g stroke="#e7fff2" stroke-width="8"><circle cx="110" cy="53" r="31"/><circle cx="250" cy="53" r="31"/><circle cx="110" cy="167" r="31"/><circle cx="250" cy="167" r="31"/></g>
+                <g stroke="#7fc5b1" stroke-width="2"><path d="M92 53h36M232 53h36M92 167h36M232 167h36"/></g>
+                <path d="M180 25V8M294 110h17M180 194v17M47 110H29" stroke="#c7f58c" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="180" cy="8" r="4" fill="#c7f58c"/><circle cx="311" cy="110" r="4" fill="#c7f58c"/>
+              </svg>
+            </div>
+            <div class="orbit-bottom"><span>概念 → 理解 → 查原始文件</span><span>KEEP LEARNING ↗</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="articles" aria-labelledby="articles-title">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-label">01 / START READING</span>
+            <h2 id="articles-title">從這三篇開始</h2>
+          </div>
+          <p class="section-lead">目前收錄 <strong>3 篇</strong>入門筆記。每一篇都有簡短說明、常見疑問和官方資料來源，讀完再深入查資料也比較有方向。</p>
+        </div>
+        <div class="article-grid">
+          <!-- ARTICLE_CARDS_START -->
+          <a class="article-card" href="pages/pixhawk.html" aria-label="閱讀 Pixhawk 是什麼？">
+            <div class="card-top"><div class="icon-box" aria-hidden="true">⌘</div><span class="card-num">NOTE 001</span></div>
+            <div class="card-meta">飛控基礎 · 約 5 分鐘</div>
+            <h3>Pixhawk 是什麼？</h3>
+            <p>飛控板、ArduPilot、地面站到底誰負責什麼？從最容易搞混的三個角色開始。</p>
+            <span class="card-link">閱讀筆記 ↗</span>
+          </a>
+          <a class="article-card" href="pages/flight-modes.html" aria-label="閱讀 Stabilize、AltHold、Loiter 差在哪？">
+            <div class="card-top"><div class="icon-box" aria-hidden="true">◎</div><span class="card-num">NOTE 002</span></div>
+            <div class="card-meta">飛行控制 · 約 6 分鐘</div>
+            <h3>Stabilize、AltHold、Loiter 差在哪？</h3>
+            <p>同樣是讓無人機飛起來，三種模式其實幫你控制了不同的事情。</p>
+            <span class="card-link">閱讀筆記 ↗</span>
+          </a>
+          <a class="article-card" href="pages/prearm.html" aria-label="閱讀 Pre-Arm 錯誤排查入門">
+            <div class="card-top"><div class="icon-box" aria-hidden="true">✓</div><span class="card-num">NOTE 003</span></div>
+            <div class="card-meta">故障排查 · 約 7 分鐘</div>
+            <h3>Pre-Arm 錯誤排查入門</h3>
+            <p>解鎖前檢查沒通過，該從哪裡查起？先辨認錯誤類型，再對照官方文件。</p>
+            <span class="card-link">閱讀筆記 ↗</span>
+          </a>
+          <!-- ARTICLE_CARDS_END -->
+        </div>
+      </div>
+    </section>
+
+    <section class="route-section" id="start" aria-labelledby="route-title">
+      <div class="container">
+        <div class="route-box">
+          <div>
+            <span class="section-label">02 / A SMALL LEARNING PATH</span>
+            <h2 id="route-title">不知道先看哪個？</h2>
+            <p>先認識飛控板和軟體的分工，再理解飛行模式，之後碰到 EKF、Pre-Arm 或其他問題，會比較知道要從哪裡查起。</p>
+          </div>
+          <div class="route-steps" aria-label="建議閱讀順序"><span class="route-chip">Pixhawk</span><span class="route-arrow">→</span><span class="route-chip">飛行模式</span><span class="route-arrow">→</span><a class="route-chip" href="pages/prearm.html">Pre-Arm 排查</a></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="container about-bar">
+    <div><strong>UAV Lab Wiki</strong><br>為新進實驗室成員整理的入門筆記。</div>
+    <p class="footer-note">本站內容僅供學習，不取代官方手冊、實驗室安全規範或實際飛行前檢查。涉及飛行操作，請依硬體及韌體版本確認。</p>
+  </footer>
+</body>
+</html>

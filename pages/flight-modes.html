@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="從入門角度比較 ArduPilot Copter 的 Stabilize、AltHold、Loiter 三種飛行模式：姿態、高度與位置控制。">
+  <meta name="theme-color" content="#0c2b3b">
+  <title>Stabilize、AltHold、Loiter 差在哪？｜UAV Lab Wiki</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/uav-mark.svg">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="UAV Lab Wiki 首頁">
+        <img class="brand-mark" src="../assets/img/uav-mark.svg" alt="">
+        <span>UAV Lab Wiki <small>Newcomer's field notes</small></span>
+      </a>
+      <nav class="main-nav" aria-label="主要導覽">
+        <a href="../index.html">首頁</a>
+        <a href="../index.html#articles">學習筆記</a>
+        <a class="nav-pill" href="../index.html#start">從這裡開始 ↗</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <header class="article-heading">
+      <div class="container">
+        <div class="breadcrumbs"><a href="../index.html">首頁</a> / 飛行模式</div>
+        <div class="meta-line"><span class="topic">飛行控制</span><span>NOTE 002</span><span>約 6 分鐘閱讀</span></div>
+        <h1>Stabilize、AltHold、<br>Loiter 差在哪？</h1>
+        <p>第一次看到 ArduPilot 的飛行模式選單時，很容易覺得只是名稱不一樣。其實差別在於：飛控幫你控制到哪個程度。</p>
+      </div>
+    </header>
+    <div class="container article-shell">
+      <article class="article-body" aria-label="飛行模式入門文章">
+        <div class="lede-box" id="summary">
+          <strong>先說結論</strong>
+          <p>對 ArduPilot Copter 來說，Stabilize 主要協助穩定機身姿態；AltHold（Altitude Hold，高度保持）再加入自動高度控制；Loiter（定點保持）則進一步嘗試維持水平位置。越往後，通常越仰賴高度與定位資訊是否可靠。</p>
+        </div>
+        <section id="compare">
+          <h2>它們在無人機裡做什麼？</h2>
+          <p>先想像你放開遙控器的左右、前後搖桿。Stabilize 會讓機身傾角回到接近水平，但不代表無人機不會被風吹走；AltHold 還會幫忙維持高度；Loiter 則會嘗試把水平位置也穩住。</p>
+          <table class="info-table">
+            <thead><tr><th scope="col">模式</th><th scope="col">主要幫忙控制</th><th scope="col">需要的資訊</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Stabilize</strong></td><td>機身 Roll（滾轉）、Pitch（俯仰）的姿態穩定；油門高度主要由操作者調整</td><td>姿態估測；不要求有效水平位置估測</td></tr>
+              <tr><td><strong>AltHold</strong></td><td>姿態 + 自動高度保持；水平位置仍可能漂移</td><td>姿態與高度估測；不要求有效水平位置估測</td></tr>
+              <tr><td><strong>Loiter</strong></td><td>姿態 + 高度 + 水平位置保持</td><td>可信的水平位置估測，通常來自 GPS，也可能來自支援的其他定位來源</td></tr>
+            </tbody>
+          </table>
+          <p>這裡的「控制」是為了幫助理解，不代表任一模式都能不經檢查直接安全起飛。不同機型、韌體版本與設定都會影響實際行為。</p>
+        </section>
+        <section id="positions">
+          <h2>為什麼 Loiter 特別在意定位？</h2>
+          <p>如果想讓無人機「留在原本的位置」，控制系統必須先知道自己相對於目標位置的偏差。如果只有機身傾斜角度，卻沒有可信的位置估測，就無法單靠姿態控制做到可靠定點。</p>
+          <p>這也是為什麼常會聽到「Loiter 要 GPS」。但比較精確的說法是：<strong>Loiter 需要有效的位置資訊，不一定永遠只能由 GPS 提供。</strong> 在具備受支援的視覺或其他定位系統、且整體設定正確的情況下，也可能使用非 GPS 的位置估測來源。</p>
+          <div class="note-box"><strong>無 GPS 實驗要注意：</strong>不裝 GPS 並不代表可以忽略位置估測。若系統沒有可靠的定位來源，就不能假設 Loiter 可以正常定點。請先核對 ArduPilot 對模式、感測器及韌體版本的要求。</div>
+        </section>
+        <section id="questions">
+          <h2>常見疑問</h2>
+          <div class="qa-item">
+            <h3>Q1：Stabilize 放開搖桿，無人機就會停在原地嗎？</h3>
+            <p>不會。它主要讓 Roll 與 Pitch 姿態恢復水平，並不主動維持水平位置。外在風力或原有速度仍可能讓無人機移動。</p>
+          </div>
+          <div class="qa-item">
+            <h3>Q2：AltHold 會幫我控制前後左右的位置嗎？</h3>
+            <p>不會。AltHold 重點是高度保持，Roll、Pitch 控制方式與 Stabilize 類似，因此水平位置仍需操作者注意。</p>
+          </div>
+          <div class="qa-item">
+            <h3>Q3：只要切到 Loiter 就一定能定點嗎？</h3>
+            <p>不是。Loiter 的表現受到位置估測品質、感測器、設定與環境影響；是否能進入模式也有前提，不能只看切換開關的位置。</p>
+          </div>
+        </section>
+        <section id="sources">
+          <h2>延伸閱讀與資料來源</h2>
+          <p>以下以 ArduPilot Copter 官方文件為主要參考：</p>
+          <ul class="sources-list">
+            <li><a href="https://ardupilot.org/copter/docs/flight-modes.html" target="_blank" rel="noopener noreferrer">ArduPilot — Flight Modes（飛行模式總覽）</a></li>
+            <li><a href="https://docs.ardupilot.org/copter/docs/stabilize-mode.html" target="_blank" rel="noopener noreferrer">ArduPilot — Stabilize Mode</a></li>
+            <li><a href="https://ardupilot.org/copter/docs/altholdmode.html" target="_blank" rel="noopener noreferrer">ArduPilot — Altitude Hold Mode</a></li>
+            <li><a href="https://ardupilot.org/copter/docs/loiter-mode.html" target="_blank" rel="noopener noreferrer">ArduPilot — Loiter Mode</a></li>
+          </ul>
+        </section>
+        <section id="next">
+          <div class="read-next">
+            <h2>接著可以看</h2>
+            <p>如果還沒弄清 Pixhawk 與 ArduPilot 的差別，可以先回頭看硬體與軟體分工。</p>
+            <a href="pixhawk.html">上一篇：Pixhawk 是什麼？ ↗</a>
+          </div>
+        </section>
+      </article>
+      <aside class="toc" aria-label="本文目錄">
+        <h2>這篇會讀到</h2>
+        <a href="#summary">先說結論</a>
+        <a href="#compare">它們在無人機裡做什麼？</a>
+        <a href="#positions">為什麼 Loiter 在意定位？</a>
+        <a href="#questions">常見疑問</a>
+        <a href="#sources">延伸閱讀與資料來源</a>
+        <a href="#next">接著可以看</a>
+        <small>這是模式概念比較，不是操作教學。飛行前請完成實際安全檢查。</small>
+      </aside>
+    </div>
+  </main>
+  <footer class="container about-bar">
+    <div><strong>UAV Lab Wiki</strong><br><a href="../index.html">← 返回所有筆記</a></div>
+    <p class="footer-note">本站內容僅供學習，不取代官方手冊、實驗室安全規範或實際飛行前檢查。涉及飛行操作，請依硬體及韌體版本確認。</p>
+  </footer>
+</body>
+</html>

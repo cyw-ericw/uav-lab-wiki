@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Pixhawk 是什麼？快速搞懂飛控硬體、ArduPilot 飛控韌體和 QGroundControl 地面站的分工。">
+  <meta name="theme-color" content="#0c2b3b">
+  <title>Pixhawk 是什麼？｜UAV Lab Wiki</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/uav-mark.svg">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="UAV Lab Wiki 首頁">
+        <img class="brand-mark" src="../assets/img/uav-mark.svg" alt="">
+        <span>UAV Lab Wiki <small>Newcomer's field notes</small></span>
+      </a>
+      <nav class="main-nav" aria-label="主要導覽">
+        <a href="../index.html">首頁</a>
+        <a href="../index.html#articles">學習筆記</a>
+        <a class="nav-pill" href="../index.html#start">從這裡開始 ↗</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <header class="article-heading">
+      <div class="container">
+        <div class="breadcrumbs"><a href="../index.html">首頁</a> / Pixhawk 是什麼？</div>
+        <div class="meta-line"><span class="topic">飛控基礎</span><span>NOTE 001</span><span>約 5 分鐘閱讀</span></div>
+        <h1>Pixhawk 是什麼？</h1>
+        <p>剛開始接觸無人機時，常會同時聽到 Pixhawk、ArduPilot、QGroundControl。它們不是三個不同品牌的同一樣東西，而是在系統裡負責不同工作。</p>
+      </div>
+    </header>
+    <div class="container article-shell">
+      <article class="article-body" aria-label="Pixhawk 入門文章">
+        <div class="lede-box" id="summary">
+          <strong>先說結論</strong>
+          <p>Pixhawk 是一系列飛行控制器（Flight Controller，飛控）硬體平台。飛控板讀取感測器資料、運行飛控軟體並輸出控制訊號；而 ArduPilot 是可運行在支援硬體上的飛控韌體，QGroundControl 則是用來查看狀態與進行設定的地面站軟體。硬體、韌體、地面站要分開理解。</p>
+        </div>
+        <section id="role">
+          <h2>它在無人機裡做什麼？</h2>
+          <p>可以把飛控想成無人機的「控制中心」。它會接收感測器和遙控器等資訊，依照目前的飛行模式計算控制需求，再把指令交給馬達控制相關設備。</p>
+          <p>以常見的四軸無人機為例，四顆馬達要互相配合，才能控制機身的傾斜、轉向與升降。飛控系統負責處理這種持續變化的控制工作；並不是遙控器直接個別指揮四顆馬達。</p>
+          <table class="info-table">
+            <thead><tr><th scope="col">名稱</th><th scope="col">它是什麼</th><th scope="col">主要用途</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Pixhawk 6C</strong></td><td>飛控硬體</td><td>連接感測器、遙控與其他設備，執行控制相關工作</td></tr>
+              <tr><td><strong>ArduPilot</strong></td><td>飛控韌體／開源軟體專案</td><td>提供飛行模式、狀態估測與控制等功能</td></tr>
+              <tr><td><strong>QGroundControl</strong></td><td>地面站（Ground Control Station，GCS）</td><td>查看狀態、設定參數及進行相關操作</td></tr>
+            </tbody>
+          </table>
+        </section>
+        <section id="sensors">
+          <h2>飛控怎麼知道機身在動？</h2>
+          <p>飛控會利用感測器取得資料。以 Holybro 的 Pixhawk 6C 為例，官方規格列有多組 IMU（慣性測量單元）以及氣壓計等感測器。IMU 裡面的陀螺儀與加速度計，能提供角速度與加速度等資訊。</p>
+          <p>但感測器的單筆讀數並不等於完整的「位置」。系統還需要狀態估測（State Estimation）方法，根據不同感測器的資訊估測姿態、速度、位置等狀態；這也是之後會接觸 EKF（延伸卡爾曼濾波器）的原因。</p>
+          <div class="note-box"><strong>小提醒：</strong>不同 Pixhawk 型號、硬體批次和韌體版本可能有差異。這篇介紹的是概念，不是接線圖，也不能拿來直接判斷某個接口該插哪一條線。</div>
+        </section>
+        <section id="questions">
+          <h2>常見疑問</h2>
+          <div class="qa-item">
+            <h3>Q1：有 Pixhawk，就等於裝好 ArduPilot 嗎？</h3>
+            <p>不一定。Pixhawk 是硬體平台，ArduPilot 與 PX4 都是常見的飛控軟體。不同產品可能預裝不同韌體；要以目前這塊飛控實際安裝的版本為準。</p>
+          </div>
+          <div class="qa-item">
+            <h3>Q2：QGroundControl 是飛控嗎？</h3>
+            <p>不是。QGroundControl 是地面站應用程式，主要用來連線、顯示狀態與設定；真正執行飛行控制的是飛控硬體上運作的韌體。</p>
+          </div>
+          <div class="qa-item">
+            <h3>Q3：Pixhawk 可以單靠自己知道全世界的座標嗎？</h3>
+            <p>不能這樣理解。位置估測需要可信的定位資訊來源與適當的融合方法，例如 GPS 或支援的其他外部定位系統；僅有飛控板本身，不代表已具備可靠的全球位置資訊。</p>
+          </div>
+        </section>
+        <section id="sources">
+          <h2>延伸閱讀與資料來源</h2>
+          <p>想進一步看硬體細節，可以從原廠與飛控專案文件開始：</p>
+          <ul class="sources-list">
+            <li><a href="https://docs.holybro.com/autopilot/pixhawk-6c/overview" target="_blank" rel="noopener noreferrer">Holybro — Pixhawk 6C Overview（官方硬體介紹）</a></li>
+            <li><a href="https://docs.holybro.com/autopilot/pixhawk-6c/technical-specification" target="_blank" rel="noopener noreferrer">Holybro — Pixhawk 6C Technical Specification（官方規格）</a></li>
+            <li><a href="https://ardupilot.org/copter/docs/common-autopilots.html" target="_blank" rel="noopener noreferrer">ArduPilot — Choosing an Autopilot（飛控硬體挑選）</a></li>
+            <li><a href="https://ardupilot.org/copter/docs/common-apm-navigation-extended-kalman-filter-overview.html" target="_blank" rel="noopener noreferrer">ArduPilot — Extended Kalman Filter（EKF 概念）</a></li>
+          </ul>
+        </section>
+        <section id="next">
+          <div class="read-next">
+            <h2>接著可以看</h2>
+            <p>搞懂硬體、韌體、地面站的分工後，再看飛行模式會比較有感。</p>
+            <a href="flight-modes.html">下一篇：Stabilize、AltHold、Loiter 差在哪？ ↗</a>
+          </div>
+        </section>
+      </article>
+      <aside class="toc" aria-label="本文目錄">
+        <h2>這篇會讀到</h2>
+        <a href="#summary">先說結論</a>
+        <a href="#role">它在無人機裡做什麼？</a>
+        <a href="#sensors">飛控怎麼知道機身在動？</a>
+        <a href="#questions">常見疑問</a>
+        <a href="#sources">延伸閱讀與資料來源</a>
+        <a href="#next">接著可以看</a>
+        <small>這是學習筆記，不是實際接線或飛行操作程序。</small>
+      </aside>
+    </div>
+  </main>
+  <footer class="container about-bar">
+    <div><strong>UAV Lab Wiki</strong><br><a href="../index.html">← 返回所有筆記</a></div>
+    <p class="footer-note">本站內容僅供學習，不取代官方手冊、實驗室安全規範或實際飛行前檢查。涉及飛行操作，請依硬體及韌體版本確認。</p>
+  </footer>
+</body>
+</html>

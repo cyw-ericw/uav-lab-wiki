@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="認識 ArduPilot 的 Pre-Arm 解鎖前檢查，從官方錯誤訊息理解校正、遙控、電池與視覺里程計的初步排查方向。">
+  <meta name="theme-color" content="#0c2b3b">
+  <title>Pre-Arm 錯誤排查入門｜UAV Lab Wiki</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/uav-mark.svg">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="../index.html" aria-label="UAV Lab Wiki 首頁">
+        <img class="brand-mark" src="../assets/img/uav-mark.svg" alt="">
+        <span>UAV Lab Wiki <small>Newcomer's field notes</small></span>
+      </a>
+      <nav class="main-nav" aria-label="主要導覽">
+        <a href="../index.html">首頁</a>
+        <a href="../index.html#articles">學習筆記</a>
+        <a class="nav-pill" href="../index.html#start">從這裡開始 ↗</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <header class="article-heading">
+      <div class="container">
+        <div class="breadcrumbs"><a href="../index.html">首頁</a> / Pre-Arm 錯誤排查入門</div>
+        <div class="meta-line"><span class="topic">故障排查</span><span>NOTE 003</span><span>約 7 分鐘閱讀</span></div>
+        <h1>Pre-Arm 錯誤排查入門</h1>
+        <p>Pre-Arm（解鎖前檢查）沒有通過時，先讀懂訊息，再找對應文件。這篇帶你辨認問題類型，整理能交給學長姐一起確認的線索。</p>
+      </div>
+    </header>
+    <div class="container article-shell">
+      <article class="article-body" aria-label="Pre-Arm 錯誤排查入門文章">
+        <div class="lede-box" id="summary">
+          <strong>先說結論</strong>
+          <p>Pre-Arm 是 ArduPilot（開源自動駕駛軟體）在允許 Arm（解鎖）前檢查設定、校正及感測器狀態的機制。檢查失敗代表仍有條件不符合，不能直接判定 Pixhawk（飛控硬體平台）壞掉；應依完整錯誤訊息查找原因，而不是停用檢查來放行。</p>
+        </div>
+        <section id="role">
+          <h2>它在無人機裡做什麼？</h2>
+          <p>檢查由飛控上的韌體執行；GCS（地面站）如 Mission Planner 則呈現收到的訊息。先分清楚「飛控回報了什麼」和「地面站在哪裡顯示」，就不會把所有問題都當成連線或硬體故障。</p>
+          <p>ArduPilot 官方文件列出各種未通過檢查的原因與對應處理方向。未解鎖時，失敗訊息通常也會定期傳到地面站；顯示時機受設定影響，不必為取得訊息而反覆嘗試解鎖。<a href="#source-prearm">［1］</a></p>
+          <div class="note-box"><strong>本文適用範圍：</strong>以 ArduPilot Copter（多旋翼韌體）的入門判讀為主，資料查核日期為 <time datetime="2026-11-07">2026-11-07</time>。官方文件會更新，錯誤文字及處理方式請核對實際韌體版本；本文沒有做實機驗證。</div>
+        </section>
+        <section id="errors">
+          <h2>常見錯誤類型與排查方向</h2>
+          <p>以下英文是官方文件列出的訊息本體，不是自行杜撰的範例。地面站可能另加前綴；請保留你實際看到的完整原文。這些類型用來辨認方向，不代表發生頻率排名。<a href="#source-prearm">［1］</a></p>
+          <h3>1. 加速度計尚未校正</h3>
+          <p><code>3D Accel calibration needed</code>：先確認是否已完成加速度計校正。官方要求在未解鎖狀態進行，並先確認飛控安裝方向；依校正提示放置機體且保持靜止，不能把晃動中的讀數當成有效校正。完整程序見<a href="#source-accel">官方加速度計校正文件［2］</a>。</p>
+          <h3>2. 陀螺儀校正未完成</h3>
+          <p><code>Gyros not calibrated</code>：官方將此訊息對應到啟動時的陀螺儀校正失敗。依安全程序重新啟動並保持機體靜止，觀察訊息是否解除；持續失敗時先停止後續操作並保留紀錄。<a href="#source-prearm">［1］</a></p>
+          <h3>3. 遙控器輸入未校正</h3>
+          <p><code>RC not calibrated</code>：RC（無線遙控）校正讓韌體理解各通道的輸入範圍。先在地面站確認是否收到搖桿輸入及通道對應；沒有輸入時先檢查收發機連線，有輸入再依官方流程校正，不能只手填一組網路上的數值。<a href="#source-radio">［3］</a></p>
+          <h3>4. 電池電壓未達解鎖條件</h3>
+          <p><code>Battery below minimum arming voltage</code>：回報的電池電壓低於設定的解鎖門檻。先核對電池狀態與電池監測配置，不要為消除訊息直接降低保護門檻；本文不提供跨電池通用的電壓值。<a href="#source-prearm">［1］</a></p>
+          <h3>5. 視覺里程計沒有提供資料</h3>
+          <p><code>VisOdom: not healthy</code>：官方指向 Visual Odometry（視覺里程計）資料未送達。初步查實體連線與配置；相機能顯示畫面，不代表飛控已收到定位資料。非 GPS（全球定位系統）導航也需要正確配置的定位來源，不能只因沒有 GPS 就忽略這項錯誤。<a href="#source-prearm">［1］</a><a href="#source-navigation">［4］</a></p>
+        </section>
+        <section id="workflow">
+          <h2>初步排查：先收集，再對照</h2>
+          <div class="note-box"><strong>桌面檢查前：</strong>先依實驗室安全程序拆除螺旋槳並保持未解鎖。遙控校正官方流程另要求斷開電池、以 USB 連接飛控；各項操作的供電與安全前提請逐一查對應手冊，不以這份筆記取代。<a href="#source-radio">［3］</a></div>
+          <p>以下是整理問題的筆記流程，不是自動診斷或解鎖步驟：</p>
+          <ol>
+            <li><strong>保存原文：</strong>記錄完整訊息、出現時機及畫面，不只寫「不能解鎖」。</li>
+            <li><strong>記錄配置：</strong>寫下飛控型號、Copter 韌體版本、地面站版本、飛行模式、供電方式與已連接的感測器。</li>
+            <li><strong>找官方對應項目：</strong>以訊息原文搜尋來源［1］，再進入它連結的校正或設定文件。</li>
+            <li><strong>一次確認一個原因：</strong>記錄改動前後差異，再查看是否還有其他錯誤；不要同時亂改多個參數。</li>
+            <li><strong>無法確認就交接：</strong>把訊息、配置與已做的檢查提供給學長姐。保留安全檢查，不帶著未釐清的故障繼續試飛。</li>
+          </ol>
+        </section>
+        <section id="questions">
+          <h2>常見疑問</h2>
+          <div class="qa-item">
+            <h3>Q1：能不能先關閉檢查，讓它解鎖再說？</h3>
+            <p>不應把停用檢查當成入門排查方法。官方要求在嘗試飛行前解決解鎖相關故障；訊息消失與原因被修復是兩件事。<a href="#source-prearm">［1］</a></p>
+          </div>
+          <div class="qa-item">
+            <h3>Q2：修好一個訊息後又出現另一個，是越修越壞嗎？</h3>
+            <p>不一定，系統可能同時有多個未滿足的條件。應比對前後完整紀錄，再逐項查核，不能只憑顯示順序推論新故障是剛剛的操作造成。</p>
+          </div>
+          <div class="qa-item">
+            <h3>Q3：檢查通過就表示一定可以安全起飛？</h3>
+            <p>不是。通過這些檢查不等於完成全部飛行前確認；仍須依實際配置、場地與實驗室程序檢查。本文只提供概念與文件入口。</p>
+          </div>
+        </section>
+        <section id="sources">
+          <h2>延伸閱讀與資料來源</h2>
+          <p>以下均為本次已查閱的 ArduPilot 官方文件（查核：2026-11-07）：</p>
+          <ul class="sources-list">
+            <li id="source-prearm"><a href="https://ardupilot.org/copter/docs/common-prearm-safety-checks.html" target="_blank" rel="noopener noreferrer">［1］Pre-Arm Safety Checks（解鎖前安全檢查）</a> — 檢查機制、英文錯誤訊息與處理方向的主要依據。</li>
+            <li id="source-accel"><a href="https://ardupilot.org/copter/docs/common-accelerometer-calibration.html" target="_blank" rel="noopener noreferrer">［2］Accelerometer Calibration（加速度計校正）</a> — 校正前提、安裝方向與靜止要求。</li>
+            <li id="source-radio"><a href="https://ardupilot.org/copter/docs/common-radio-control-calibration.html" target="_blank" rel="noopener noreferrer">［3］Radio Control Calibration（遙控器校正）</a> — 供電前提、通道輸入與校正概念。</li>
+            <li id="source-navigation"><a href="https://ardupilot.org/copter/docs/common-non-gps-navigation-landing-page.html" target="_blank" rel="noopener noreferrer">［4］Non-GPS Navigation（非 GPS 導航）</a> — 外部定位來源與相關配置文件入口。</li>
+          </ul>
+        </section>
+        <section id="next">
+          <div class="read-next">
+            <h2>接著可以看</h2>
+            <p>分清楚硬體與軟體的責任，再看不同模式需要哪些狀態資訊。</p>
+            <p><a href="pixhawk.html">Pixhawk 是什麼？ ↗</a></p>
+            <a href="flight-modes.html">Stabilize、AltHold、Loiter 差在哪？ ↗</a>
+          </div>
+        </section>
+      </article>
+      <aside class="toc" aria-label="本文目錄">
+        <h2>這篇會讀到</h2>
+        <a href="#summary">先說結論</a>
+        <a href="#role">它在無人機裡做什麼？</a>
+        <a href="#errors">常見錯誤類型與排查方向</a>
+        <a href="#workflow">初步排查：先收集，再對照</a>
+        <a href="#questions">常見疑問</a>
+        <a href="#sources">延伸閱讀與資料來源</a>
+        <a href="#next">接著可以看</a>
+        <small>這是入門判讀筆記，不是解鎖或試飛程序。先查明原因，再依安全程序處理。</small>
+      </aside>
+    </div>
+  </main>
+  <footer class="container about-bar">
+    <div><strong>UAV Lab Wiki</strong><br><a href="../index.html">← 返回所有筆記</a></div>
+    <p class="footer-note">本站內容僅供學習，不取代官方手冊、實驗室安全規範或實際飛行前檢查。涉及飛行操作，請依硬體及韌體版本確認。</p>
+  </footer>
+</body>
+</html>
