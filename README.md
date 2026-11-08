@@ -7,7 +7,7 @@
 ## 看網站
 
 - 本機：下載或解壓縮專案後，直接開啟 `index.html`。
-- GitHub Pages：等公開部署完成後，在這裡補上網站網址。
+- GitHub Pages：[開啟 UAV Lab Wiki 公開網站](https://cyw-ericw.github.io/uav-lab-wiki/)
 
 ## 已發布文章
 
@@ -16,8 +16,9 @@
 
 - [Pre-Arm 錯誤排查入門](pages/prearm.html) — 解鎖前檢查、常見錯誤類型與官方排查入口。
 
-> 第二階段已依既有 `AGENTS.md` 新增 Pre-Arm 文章，同步更新首頁卡片、文章總數及本清單。尚未上傳 GitHub 或部署 GitHub Pages。
+> 第二階段已依照 AGENTS.md 新增 Pre-Arm 文章，並同步更新首頁卡片、文章數量及本清單。
 
+> 第三階段（已完成）：已將完整專案上傳 GitHub，並透過 GitHub Pages 公開網站。已確認公開首頁及三篇技術文章可以正常瀏覽。
 ## 專案結構
 
 ```text
